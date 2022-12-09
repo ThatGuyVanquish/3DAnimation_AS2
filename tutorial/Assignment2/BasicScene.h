@@ -10,6 +10,7 @@
 #include <iostream>
 #include "../engine/Mesh.h"
 #include "MeshSimplification.h"
+#include <igl/AABB.h>
 
 class BasicScene : public cg3d::Scene
 {
@@ -18,10 +19,11 @@ public:
     void Init(float fov, int width, int height, float near, float far);
     void Update(const cg3d::Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model) override;
     void KeyCallback(cg3d::Viewport* viewport, int x, int y, int key, int scancode, int action, int mods) override;
+    void CursorPosCallback(cg3d::Viewport* viewport, int x, int y, bool dragging, int* buttonState);
 
 private:
     std::shared_ptr<Movable> root;
     std::shared_ptr<MeshSimplification> myMeshObj;
-    std::shared_ptr<cg3d::AutoMorphingModel> myAutoModel;
-    
+    std::vector<std::shared_ptr<cg3d::AutoMorphingModel>> models;
+    std::vector<igl::AABB<Eigen::MatrixXd, 3>> AABBs;
 };
