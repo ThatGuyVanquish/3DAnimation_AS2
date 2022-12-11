@@ -25,7 +25,7 @@ namespace CollisionDetection
 	
 	static Eigen::AlignedBox3d transformBox(
 		Eigen::AlignedBox3d box, 
-		const Eigen::Matrix4d& transform
+		const Eigen::Matrix4f& transform
 	)
 	{
 		auto min = box.min(), max = box.max();
@@ -42,9 +42,9 @@ namespace CollisionDetection
 
 	static bool intersects(
 		const igl::AABB<Eigen::MatrixXd, 3>& obb1,
-		const Eigen::Matrix4d& transform1,
+		const Eigen::Matrix4f& transform1,
 		const igl::AABB<Eigen::MatrixXd, 3>& obb2,
-		const Eigen::Matrix4d& transform2,
+		const Eigen::Matrix4f& transform2,
 		Eigen::AlignedBox3d &collidedBox1,
 		Eigen::AlignedBox3d &collidedBox2)
 	{
