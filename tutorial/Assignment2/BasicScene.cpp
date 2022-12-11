@@ -100,7 +100,7 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     {
         models[1]->Translate(speed * dir);
     }
-    Eigen::AlignedBox<double, 3> box1, box2;
+    Eigen::AlignedBox3d box1, box2;
     if (CollisionDetection::intersects(
         AABBs[0],
         models[0]->GetTransform(),

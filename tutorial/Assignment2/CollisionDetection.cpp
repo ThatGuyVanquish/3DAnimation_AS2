@@ -1,3 +1,4 @@
+#pragma once
 #include <utility>
 #include <Eigen/Core>
 #include <Eigen/LU> 
@@ -22,16 +23,21 @@ namespace CollisionDetection
 			V(i, 3) = 1;
 	}
 	
-	static Eigen::AlignedBox<double, 3> transformBox(
-		Eigen::AlignedBox<double, 3> box, 
+	static Eigen::AlignedBox3d transformBox(
+		Eigen::AlignedBox3d box, 
 		const Eigen::Matrix4d& transform
 	)
 	{
-		Eigen::Vector4d newMin = (box.min(), 1) * transform;
-		Eigen::Vector4d newMax = (box.max(), 1) * transform;
+		auto min = box.min(), max = box.max();
+		Eigen::Vector4d newMin;
+		newMin << min[0], min[1], min[2], 1;
+		newMin = transform * newMin;
+		Eigen::Vector4d newMax;
+		newMax << max[0], max[1], max[2], 1;
+		newMax = transform * newMax;
 		return Eigen::AlignedBox<double, 3>(
-			(newMin.col(0), newMin.col(1), newMin.col(2)),
-			(newMax.col(0), newMax.col(1), newMax.col(2)));
+			Eigen::Vector3d(newMin[0], newMin[1], newMin[2]),
+			Eigen::Vector3d(newMax[0], newMax[1], newMax[2]));
 	}
 
 	static bool intersects(
@@ -39,10 +45,10 @@ namespace CollisionDetection
 		const Eigen::Matrix4d& transform1,
 		const igl::AABB<Eigen::MatrixXd, 3>& obb2,
 		const Eigen::Matrix4d& transform2,
-		Eigen::AlignedBox<double, 3> &collidedBox1,
-		Eigen::AlignedBox<double, 3>& collidedBox2)
+		Eigen::AlignedBox3d &collidedBox1,
+		Eigen::AlignedBox3d &collidedBox2)
 	{
-		auto transformedBox1 = transformBox(obb1.m_box, transform1),
+		Eigen::AlignedBox3d transformedBox1 = transformBox(obb1.m_box, transform1),
 			transformedBox2 = transformBox(obb2.m_box, transform2);
 		if (transformedBox1.intersects(transformedBox2))
 		{
