@@ -29,10 +29,10 @@ namespace CollisionDetection
 	)
 	{
 		auto min = box.min(), max = box.max();
-		Eigen::Vector4d newMin;
+		Eigen::Vector4f newMin;
 		newMin << min[0], min[1], min[2], 1;
 		newMin = transform * newMin;
-		Eigen::Vector4d newMax;
+		Eigen::Vector4f newMax;
 		newMax << max[0], max[1], max[2], 1;
 		newMax = transform * newMax;
 		return Eigen::AlignedBox<double, 3>(
