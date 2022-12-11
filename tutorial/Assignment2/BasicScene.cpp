@@ -7,9 +7,6 @@ bool startMoving = false;
 float speed = 0.01;
 int dist = 0;
 Eigen::Vector3f dir = Movable::AxisVec(Movable::Axis::X);
-Eigen::MatrixXd V;
-Eigen::MatrixXi F;
-
 
 void BasicScene::Init(float fov, int width, int height, float near, float far)
 {
@@ -84,18 +81,14 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         if (i % 2 == 0) models[i]->Translate(dist, Movable::Axis::X);
         else models[i]->Translate(-dist, Movable::Axis::X);
     }
-    
-    // Create AABBs
-    AABBs = std::vector<igl::AABB<Eigen::MatrixXd, 3>>(2);
-    //igl::read_triangle_mesh(objFiles[objIndex], V, F);
-    //V.conservativeResize(V.rows(), 4);
-    //for(int i = 0; i < V.rows(); i++)
-    //    V(i, 3) = 1;
+    Eigen::MatrixXd V;
+    Eigen::MatrixXi F;
+    igl::read_triangle_mesh(objFiles[objIndex], V, F);
+    for(int i = 0; i < 2; i++)
+        AABBs[i].init(V, F);
+
     // place models on the screen MISSING
     camera->Translate(cameraTranslate, Axis::Z);
-    // somewhere, whenever we press the button "K" start moving models[0] towards models[1], 
-    // allow arrows to move it in 2D towards models[1] in range of 180 degrees
-
 }
 
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
@@ -107,24 +100,28 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     {
         models[1]->Translate(speed * dir);
     }
+    Eigen::AlignedBox<double, 3> box1, box2;
+    if (CollisionDetection::intersects(
+        AABBs[0],
+        models[0]->GetTransform(),
+        AABBs[1],
+        models[1]->GetTransform(),
+        box1,
+        box2))
+    {
+        startMoving = false;
+    }
     
-    //for (int i = 0; i < 2; i++)
-    //{
-        //auto temp = V * models[i]->GetTransform();
-        //Eigen::MatrixXd tempV(V.rows(), 3);
-        /*
+    /*
         
-        we want to take V which is N * 3 and change it to N * 4 to multiply it by transformation matrix 4x4
-        Then we get the real position of every vertex according to the global environment
-        Then we can initialize a new N * 3 matrix of doubles and initialize the AABBs with it.
-        Afterwards we calculate the collision - we don't know yet blyat 
+    we want to take V which is N * 3 and change it to N * 4 to multiply it by transformation matrix 4x4
+    Then we get the real position of every vertex according to the global environment
+    Then we can initialize a new N * 3 matrix of doubles and initialize the AABBs with it.
+    Afterwards we calculate the collision - we don't know yet blyat 
 
-        find out how to calculate a_i and b_i and A_i and B_i and center of mass of mesh objects
+    find out how to calculate a_i and b_i and A_i and B_i and center of mass of mesh objects
 
-        */
-        //AABBs[i].init(temp, F);
-    //}
-    std::cout << "Model 1 is in \n" << models[1]->GetTransform() << std::endl;
+    */
 }
 
 void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scancode, int action, int mods)

@@ -11,6 +11,7 @@
 #include "../engine/Mesh.h"
 #include "MeshSimplification.h"
 #include <igl/AABB.h>
+#include "CollisionDetection.cpp"
 
 class BasicScene : public cg3d::Scene
 {
