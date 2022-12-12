@@ -29,8 +29,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         "data/cheburashka.off", /* 2 */
         "data/fertility.off" /* 3 */,
         "data/cube.off"};
-    int objIndex = 4;
-    int decimations = 7;
+    int objIndex = 0;
+    int decimations = 0;
     int recalcQsRate = 10;
     std::chrono::time_point<std::chrono::steady_clock> m_StartTime = std::chrono::high_resolution_clock::now();
     myMeshObj = std::make_shared<MeshSimplification>(MeshSimplification(objFiles[objIndex], decimations, recalcQsRate));
@@ -90,6 +90,49 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         axisAligned.init(V, F);
         AABBs.push_back(axisAligned);
     }
+    /*Eigen::MatrixXd test1;
+    Eigen::MatrixXi test2;
+    igl::read_triangle_mesh("data/cube.off", test1, test2);
+    std::cout << test1 << std::endl << std::endl;
+    std::cout << test2 << std::endl;*/
+    //// add bounding box meshes
+    collisionBoxes.push_back(
+        cg3d::Model::Create(
+            "Bounding box 0", 
+            CollisionDetection::meshifyBoundingBox(AABBs[0].m_box), 
+            material
+        )
+    );
+    collisionBoxes[0]->aggregatedTransform = models[0]->aggregatedTransform;
+    collisionBoxes[0]->showFaces = false;
+    collisionBoxes[0]->showWireframe = true;
+    models[0]->AddChild(collisionBoxes[0]);
+    models[0]->showFaces = false;
+    
+    //// model pointer will be set to collided aabb aligned box after collision
+    ////std::shared_ptr<cg3d::Model> box0Collision;
+    ////collisionBoxes.push_back(box0Collision); // NULL at index 1 until we set it to actual value
+    //models[0]->AddChild(collisionBoxes[1]);
+
+    collisionBoxes.push_back(
+        cg3d::Model::Create(
+            "Bounding box 1", 
+            CollisionDetection::meshifyBoundingBox(AABBs[1].m_box),
+            material
+        )
+    );
+    collisionBoxes[1]->aggregatedTransform = models[1]->aggregatedTransform;
+    models[1]->AddChild(collisionBoxes[1]);
+    collisionBoxes[1]->showFaces = false;
+    collisionBoxes[1]->showWireframe = true;
+    models[1]->showFaces = false;
+
+    // model pointer will be set to collided aabb aligned box after collision
+    //std::shared_ptr<cg3d::Model> box1Collision;
+    //collisionBoxes.push_back(box1Collision); // NULL at index 3 until we set it to actual value
+    //models[1]->AddChild(collisionBoxes[3]);
+
+
     // place models on the screen MISSING
     camera->Translate(cameraTranslate, Axis::Z);
 }
@@ -97,8 +140,9 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
 {
     Scene::Update(program, proj, view, model);
-    program.SetUniform4f("lightColor", 1.0f, 1.0f, 1.0f, 0.5f);
-    program.SetUniform4f("Kai", 1.0f, 1.0f, 1.0f, 1.0f);
+    program.SetUniform4f("lightColor", 100.0f, 145.0f, 1.0f, 0.5f);
+    //program.SetUniform4f("Kai", 0.0f, 1.0f, 1.0f, 1.0f);
+    collisionBoxes[0]->wireframeColor = Eigen::Vector4f(100.0f, 0.0f, 100.0f, 0.0f);
     if (startMoving)
     {
         models[1]->Translate(speed * dir);
@@ -106,9 +150,9 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     Eigen::AlignedBox3d box1, box2;
     if (CollisionDetection::intersects(
         AABBs[0],
-        models[0]->GetTransform(),
+        models[0]->GetTransform().cast<double>(),
         AABBs[1],
-        models[1]->GetTransform(),
+        models[1]->GetTransform().cast<double>(),
         box1,
         box2))
     {
