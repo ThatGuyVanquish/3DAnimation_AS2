@@ -18,6 +18,7 @@
 
 namespace CollisionDetection {
     static std::shared_ptr<cg3d::Mesh> meshifyBoundingBox(Eigen::AlignedBox3d &box) {
+
         Eigen::Vector3d
                 blf = box.corner(Eigen::AlignedBox3d::BottomLeftFloor),
                 brf = box.corner(Eigen::AlignedBox3d::BottomRightFloor),
