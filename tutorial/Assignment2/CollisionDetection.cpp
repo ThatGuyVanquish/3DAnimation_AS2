@@ -48,11 +48,11 @@ namespace CollisionDetection
 		Eigen::AlignedBox3d &collidedBox1,
 		Eigen::AlignedBox3d &collidedBox2)
 	{
+		std::cout << "blyat this is here\n";
 		Eigen::AlignedBox3d transformedBox1 = transformBox(obb1.m_box, transform1),
 			transformedBox2 = transformBox(obb2.m_box, transform2);
 		if (transformedBox1.intersects(transformedBox2))
 		{
-
 			if (obb1.is_leaf() && obb2.is_leaf())
 			{
 				collidedBox1 = transformedBox1;

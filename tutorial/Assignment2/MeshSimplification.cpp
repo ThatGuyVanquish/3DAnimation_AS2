@@ -301,7 +301,7 @@ void MeshSimplification::createDecimatedMesh(std::string fileName)
             );
         }
     }
-    std::cout << "Initial Number of edges: " << E.rows() << std::endl;
-    std::cout << "Collapsed edges: " << collapseCounter << std::endl;
-    std::cout << "Qs were recalculated " << recalc << " times" << std::endl;
+    //std::cout << "Initial Number of edges: " << E.rows() << std::endl;
+    //std::cout << "Collapsed edges: " << collapseCounter << std::endl;
+    //std::cout << "Qs were recalculated " << recalc << " times" << std::endl;
 }

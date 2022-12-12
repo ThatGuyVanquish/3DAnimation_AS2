@@ -84,9 +84,12 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     Eigen::MatrixXd V;
     Eigen::MatrixXi F;
     igl::read_triangle_mesh(objFiles[objIndex], V, F);
-    for(int i = 0; i < 2; i++)
-        AABBs[i].init(V, F);
-
+    for (int i = 0; i < 2; i++)
+    {
+        igl::AABB<Eigen::MatrixXd, 3> axisAligned;
+        axisAligned.init(V, F);
+        AABBs.push_back(axisAligned);
+    }
     // place models on the screen MISSING
     camera->Translate(cameraTranslate, Axis::Z);
 }
@@ -135,24 +138,24 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             glfwSetWindowShouldClose(window, GLFW_TRUE);
             break;
         case GLFW_KEY_UP:
-            models[1]->Rotate(1.0, Axis::Y);
+            models[1]->Rotate(1, Axis::Y);
             dir = models[1]->GetRotation() * dir;
             //if (myAutoModel->meshIndex > 0)
             //    myAutoModel->meshIndex--;
             break;
         case GLFW_KEY_DOWN:
-            models[1]->Rotate(-1.0, Axis::Y);
+            models[1]->Rotate(-1, Axis::Y);
             dir = models[1]->GetRotation() * dir;
             //if (myAutoModel->meshIndex < myAutoModel->GetMesh(0)->data.size())
             //    myAutoModel->meshIndex++;
             break;
         case GLFW_KEY_LEFT:
-            models[1]->Rotate(-1.0, Axis::X);
+            models[1]->Rotate(-1, Axis::X);
             dir = models[1]->GetRotation() * dir;
             /*camera->RotateInSystem(system, 0.1f, Axis::Y);*/
             break;
         case GLFW_KEY_RIGHT:
-            models[1]->Rotate(1.0, Axis::X);
+            models[1]->Rotate(1, Axis::X);
             dir = models[1]->GetRotation() * dir;
             /*camera->RotateInSystem(system, -0.1f, Axis::Y);*/
             break;
