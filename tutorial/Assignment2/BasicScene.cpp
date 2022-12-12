@@ -90,6 +90,40 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         axisAligned.init(V, F);
         AABBs.push_back(axisAligned);
     }
+    /*Eigen::MatrixXd test1;
+    Eigen::MatrixXi test2;
+    igl::read_triangle_mesh("data/cube.off", test1, test2);
+    std::cout << test1 << std::endl << std::endl;
+    std::cout << test2 << std::endl;*/
+    //// add bounding box meshes
+    collisionBoxes.push_back(
+        cg3d::Model::Create(
+            "Bounding box 0", 
+            CollisionDetection::meshifyBoundingBox(AABBs[0].m_box), 
+            material
+        )
+    );
+    models[0]->AddChild(collisionBoxes[0]);
+    //// model pointer will be set to collided aabb aligned box after collision
+    ////std::shared_ptr<cg3d::Model> box0Collision;
+    ////collisionBoxes.push_back(box0Collision); // NULL at index 1 until we set it to actual value
+    //models[0]->AddChild(collisionBoxes[1]);
+
+    //collisionBoxes.push_back(
+    //    cg3d::Model::Create(
+    //        "Bounding box 1", 
+    //        CollisionDetection::meshifyBoundingBox(AABBs[1].m_box),
+    //        material
+    //    )
+    //);
+    //models[1]->AddChild(collisionBoxes[1]);
+
+    // model pointer will be set to collided aabb aligned box after collision
+    //std::shared_ptr<cg3d::Model> box1Collision;
+    //collisionBoxes.push_back(box1Collision); // NULL at index 3 until we set it to actual value
+    //models[1]->AddChild(collisionBoxes[3]);
+
+
     // place models on the screen MISSING
     camera->Translate(cameraTranslate, Axis::Z);
 }
@@ -106,9 +140,9 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     Eigen::AlignedBox3d box1, box2;
     if (CollisionDetection::intersects(
         AABBs[0],
-        models[0]->GetTransform(),
+        models[0]->GetTransform().cast<double>(),
         AABBs[1],
-        models[1]->GetTransform(),
+        models[1]->GetTransform().cast<double>(),
         box1,
         box2))
     {
