@@ -107,13 +107,12 @@ namespace CollisionDetection {
             Eigen::AlignedBox3d &collidedBox1,
             Eigen::AlignedBox3d &collidedBox2
     ) {
-
         Eigen::Vector3d C1, a;
         Eigen::Matrix3d A;
         calcBoxInSpace(obb1.m_box, transform1, C1, A, a);
         Eigen::Vector3d C2, b;
         Eigen::Matrix3d B;
-        calcBoxInSpace(obb1.m_box, transform1, C2, B, b);
+        calcBoxInSpace(obb1.m_box, transform2, C2, B, b);
 
         Eigen::Matrix3d C = A.transpose() * B;
         Eigen::Vector3d D = C2 - C1;
@@ -231,6 +230,7 @@ namespace CollisionDetection {
         if (R > R0 + R1) return false;
 
         if (obb1.is_leaf() && obb2.is_leaf()) {
+            std::cout << "Blyat it's true" << std::endl;
             collidedBox1 = obb1.m_box;
             collidedBox2 = obb2.m_box;
             return true;

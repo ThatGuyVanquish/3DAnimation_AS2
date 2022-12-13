@@ -1,7 +1,7 @@
 #include "BasicScene.h"
 #include <chrono>
 using namespace cg3d;
-
+int kasd = 0;
 //possible fields
 bool startMoving = false;
 float speed;
@@ -108,6 +108,8 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     Eigen::AlignedBox3d box1, box2;
     if (models[1]->GetTransform() != prevTransform)
     {
+        kasd++;
+        std::cout << "test " << kasd << std::endl;
         prevTransform = models[1]->GetTransform();
         if (CollisionDetection::intersects(
             AABBs[0],
@@ -249,9 +251,9 @@ void BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::Aut
             break;
         case 1: /* Sphere */
             speed = 0.005;
-            scale = 1.5;
+            scale = 1;
             cameraTranslate = 10;
-            distX = 4;
+            distX = 1;
             distY = -1;
             break;
         //case 2: /* Cheburashka */
