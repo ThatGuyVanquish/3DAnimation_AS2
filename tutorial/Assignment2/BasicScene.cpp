@@ -4,10 +4,12 @@ using namespace cg3d;
 int kasd = 0;
 //possible fields
 bool startMoving = false;
+bool firstTime = true;
 float speed;
 int objIndex, decimations, recalcQsRate;
 Eigen::Vector3f dir = Movable::AxisVec(Movable::Axis::X);
-
+std::shared_ptr<cg3d::Model> m1, m2;
+std::shared_ptr<cg3d::Material> red;
 void BasicScene::Init(float fov, int width, int height, float near, float far)
 {
     camera = Camera::Create( "camera", fov, float(width) / height, near, far);
@@ -26,9 +28,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 
     auto green{ std::make_shared<Material>("green", program, true)};
     green->AddTexture(0, "textures/grass.bmp", 2);
-    auto red{ std::make_shared<Material>("red", program) };
+    red = { std::make_shared<Material>("red", program) };
     red->AddTexture(0, "textures/box0.bmp", 2);
-
 
     std::vector<std::string> objFiles{ "data/bunny.off", /* 0 */
         "data/sphere.obj", /* 1 */
@@ -94,6 +95,22 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     collisionBoxes[1]->showFaces = false;
     collisionBoxes[1]->showWireframe = true;
     models[1]->showFaces = false;
+    m1 = cg3d::Model::Create(
+        "cb1",
+        CollisionDetection::meshifyBoundingBox(AABBs[0].m_box),
+        red
+    );
+    m2 = cg3d::Model::Create(
+        "cb2",
+        CollisionDetection::meshifyBoundingBox(AABBs[1].m_box),
+        red
+    );
+    m1->isHidden = true;
+    m2->isHidden = true;
+    m1->aggregatedTransform = models[0]->aggregatedTransform;
+    models[0]->AddChild(m1);
+    m2->aggregatedTransform = models[1]->aggregatedTransform;
+    models[1]->AddChild(m2);
 }
 
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
@@ -120,8 +137,28 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
             box2))
             {
                 startMoving = false;
+                if (firstTime)
+                {
+                    std::vector<std::shared_ptr<cg3d::Mesh>> test1, test2;
+                    test1.push_back(CollisionDetection::meshifyBoundingBox(box1));
+                    test2.push_back(CollisionDetection::meshifyBoundingBox(box2));
+                    m1->SetMeshList(test1);
+                    m2->SetMeshList(test2);
+                    //AddChild(m1);
+                   // AddChild(m2);
+                    m1->showFaces = false;
+                    m2->showFaces = false;
+                    m1->showWireframe = true;
+                    m2->showWireframe = true;
+                    m1->isHidden = false;
+                    m2->isHidden = false;
+                    //m1->Translate({ 0,0,10 });
+                    //m2->Translate({ 0,0,10 });
+                    firstTime = false;
+                }
             }
     }
+
 }
 
 void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scancode, int action, int mods)
@@ -281,6 +318,9 @@ void BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::Aut
 
 void BasicScene::resetCB()
 {
+    firstTime = false;
+    m1->isHidden = true;
+    m2->isHidden = true;
     for(int i = 0; i < collisionBoxes.size(); i++)
         collisionBoxes[i]->SetTransform(Eigen::Matrix4f::Identity());
 }
