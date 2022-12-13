@@ -10,6 +10,7 @@
 #include <igl/AABB.h>
 #include <GLFW/glfw3.h>
 #include <igl/per_vertex_normals.h>
+#include <Movable.h>
 /*
 
 	Helper functions for collision detection
@@ -97,7 +98,8 @@ namespace CollisionDetection {
         // calculate a1, a2, a3 extents
         Eigen::Vector4d a_vec4;
         a_vec4 << box.sizes()[0], box.sizes()[1], box.sizes()[2], 1;
-        a = (transform * a_vec4).head(3) / 2;
+        a = (transform * a_vec4).head(3) / 2; // multiplying by scale rather than transform
+        // currently scale is known so i hard coded it, but need to make sure this work and fix later
     }
 
     static bool intersects(
@@ -108,14 +110,16 @@ namespace CollisionDetection {
             Eigen::AlignedBox3d &collidedBox1,
             Eigen::AlignedBox3d &collidedBox2
     ) {
+        
         Eigen::Vector3d C1, a;
         Eigen::Matrix3d A;
         calcBoxInSpace(obb1.m_box, transform1, C1, A, a);
         Eigen::Vector3d C2, b;
         Eigen::Matrix3d B;
-        calcBoxInSpace(obb1.m_box, transform2, C2, B, b);
+        calcBoxInSpace(obb2.m_box, transform2, C2, B, b);
 
         Eigen::Matrix3d C = A.transpose() * B;
+        std::cout << "A is\n" << A << "\nB is\n" << B << "\nC is\n" << C << "\n\n";
         Eigen::Vector3d D = C2 - C1;
         std::cout << "C1 = " << C1.transpose() << " C2 = " << C2.transpose() << " D = " << D.transpose() << "\n\n";
         double R0;
@@ -251,6 +255,7 @@ namespace CollisionDetection {
             collidedBox2 = obb2.m_box;
             return true;
         }
+        if (obb1.m_left == nullptr || obb2.m_left == nullptr) return false;
         return
                 intersects(*obb1.m_left, transform1, *obb2.m_left, transform2, collidedBox1, collidedBox2) ||
                 intersects(*obb1.m_left, transform1, *obb2.m_right, transform2, collidedBox1, collidedBox2) ||
