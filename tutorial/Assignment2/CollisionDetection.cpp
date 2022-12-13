@@ -81,9 +81,10 @@ namespace CollisionDetection {
                                Eigen::Matrix3d &A,
                                Eigen::Vector3d &a) {
         // calculate C (center) in the global space
-        Eigen::Vector4d Cvec4;
-        Cvec4 << C[0], C[1], C[2], 1;
+        //std::cout << "center " << box.center().transpose() << std::endl;
+        Eigen::Vector4d Cvec4(0, 0, 0, 1);
         Cvec4 = transform * Cvec4;
+        
         C = Cvec4.head(3);
         // calculate A1, A2, A3 axes in the global space
         Eigen::Vector4d A1vec4 = transform * Eigen::Vector4d(1, 0, 0, 1);
@@ -116,53 +117,60 @@ namespace CollisionDetection {
 
         Eigen::Matrix3d C = A.transpose() * B;
         Eigen::Vector3d D = C2 - C1;
-
-        int R0;
-        int R1;
-        int R;
+        std::cout << "C1 = " << C1.transpose() << " C2 = " << C2.transpose() << " D = " << D.transpose() << "\n\n";
+        double R0;
+        double R1;
+        double R;
 
         // L = A0
         R0 = a[0];
         R1 = b[0] * abs(C(0, 0)) + b[1] * abs(C(0, 1)) + b[2] * abs(C(0, 2));
         R = abs(A.col(0).transpose() * D);
+        std::cout << "A0, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl; 
         if (R > R0 + R1) return false;
 
         // L = A1
         R0 = a[1];
         R1 = b[0] * abs(C(1, 0)) + b[1] * abs(C(1, 1)) + b[2] * abs(C(1, 2));
         R = abs(A.col(1).transpose() * D);
+        std::cout << "A1, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A2
         R0 = a[2];
         R1 = b[0] * abs(C(2, 0)) + b[1] * abs(C(2, 1)) + b[2] * abs(C(2, 2));
         R = abs(A.col(2).transpose() * D);
+        std::cout << "A2, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = B0
-        R0 = a[0] * abs(C(0, 0)) + a[1] * abs(C(1, 0)) + a[2] * abs(C(2, 1));
+        R0 = a[0] * abs(C(0, 0)) + a[1] * abs(C(1, 0)) + a[2] * abs(C(2, 0));
         R1 = b[0];
         R = abs(B.col(0).transpose() * D);
+        std::cout << "B0, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = B1
         R0 = a[0] * abs(C(0, 1)) + a[1] * abs(C(1, 1)) + a[2] * abs(C(2, 1));
         R1 = b[1];
         R = abs(B.col(1).transpose() * D);
+        std::cout << "B1, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = B2
         R0 = a[0] * abs(C(0, 2)) + a[1] * abs(C(1, 2)) + a[2] * abs(C(2, 2));
         R1 = b[2];
         R = abs(B.col(2).transpose() * D);
+        std::cout << "B2, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A0 x B0
         R0 = a[1] * abs(C(2, 0)) + a[2] * abs(C(1, 0));
         R1 = b[1] * abs(C(0, 2)) + b[2] * abs(C(0, 1));
-        int arg1 = C(1, 0) * A.col(2).transpose() * D;
-        int arg2 = C(2, 0) * A.col(1).transpose() * D;
+        double arg1 = C(1, 0) * A.col(2).transpose() * D;
+        double arg2 = C(2, 0) * A.col(1).transpose() * D;
         R = abs(arg1 - arg2);
+        std::cout << "A0 X B0, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A0 x B1
@@ -171,6 +179,7 @@ namespace CollisionDetection {
         arg1 = C(1, 1) * A.col(2).transpose() * D;
         arg2 = C(2, 1) * A.col(1).transpose() * D;
         R = abs(arg1 - arg2);
+        std::cout << "A0 X B1, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A0 x B2
@@ -179,6 +188,7 @@ namespace CollisionDetection {
         arg1 = C(1, 2) * A.col(2).transpose() * D;
         arg2 = C(2, 2) * A.col(1).transpose() * D;
         R = abs(arg1 - arg2);
+        std::cout << "A0 X B2, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A1 x B0
@@ -187,6 +197,7 @@ namespace CollisionDetection {
         arg1 = C(2, 0) * A.col(0).transpose() * D;
         arg2 = C(0, 0) * A.col(2).transpose() * D;
         R = abs(arg1 - arg2);
+        std::cout << "A1 X B0, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A1 x B1
@@ -195,6 +206,7 @@ namespace CollisionDetection {
         arg1 = C(2, 1) * A.col(0).transpose() * D;
         arg2 = C(0, 1) * A.col(2).transpose() * D;
         R = abs(arg1 - arg2);
+        std::cout << "A1 X B1, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A1 x B2
@@ -203,6 +215,7 @@ namespace CollisionDetection {
         arg1 = C(2, 2) * A.col(0).transpose() * D;
         arg2 = C(0, 2) * A.col(2).transpose() * D;
         R = abs(arg1 - arg2);
+        std::cout << "A1 X B2, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A2 x B0
@@ -211,6 +224,7 @@ namespace CollisionDetection {
         arg1 = C(0, 0) * A.col(1).transpose() * D;
         arg2 = C(1, 0) * A.col(0).transpose() * D;
         R = abs(arg1 - arg2);
+        std::cout << "A2 X B0, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A2 x B1
@@ -219,6 +233,7 @@ namespace CollisionDetection {
         arg1 = C(0, 1) * A.col(1).transpose() * D;
         arg2 = C(1, 1) * A.col(0).transpose() * D;
         R = abs(arg1 - arg2);
+        std::cout << "A2 X B1, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A2 x B2
@@ -227,6 +242,7 @@ namespace CollisionDetection {
         arg1 = C(0, 2) * A.col(1).transpose() * D;
         arg2 = C(1, 2) * A.col(0).transpose() * D;
         R = abs(arg1 - arg2);
+        std::cout << "A2 X B2, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         if (obb1.is_leaf() && obb2.is_leaf()) {

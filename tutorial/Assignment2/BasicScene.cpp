@@ -35,7 +35,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         //"data/cheburashka.off", /* 2 */
         //"data/fertility.off" /* 3 */,
         "data/cube.off"};
-    objIndex = 1;
+    objIndex = 2;
     decimations = 0;
     recalcQsRate = 10;
     std::chrono::time_point<std::chrono::steady_clock> m_StartTime = std::chrono::high_resolution_clock::now();
@@ -122,19 +122,6 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
                 startMoving = false;
             }
     }
-    
-    
-    /*
-        
-    we want to take V which is N * 3 and change it to N * 4 to multiply it by transformation matrix 4x4
-    Then we get the real position of every vertex according to the global environment
-    Then we can initialize a new N * 3 matrix of doubles and initialize the AABBs with it.
-    Afterwards we calculate the collision - we don't know yet blyat 
-
-    find out how to calculate a_i and b_i and A_i and B_i and center of mass of mesh objects
-
-    */
-
 }
 
 void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scancode, int action, int mods)
@@ -269,6 +256,7 @@ void BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::Aut
         //    distY = -0.4;
         //    break;
         default:
+            speed = 0.05;
             scale = 1.5;
             cameraTranslate = 10;
             distX = 2;
