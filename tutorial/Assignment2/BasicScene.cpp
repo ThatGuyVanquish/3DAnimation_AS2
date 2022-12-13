@@ -72,13 +72,12 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         cg3d::Model::Create(
             "Bounding box 0", 
             CollisionDetection::meshifyBoundingBox(AABBs[0].m_box), 
-            red
+            green
         )
     );
     collisionBoxes[0]->aggregatedTransform = models[0]->aggregatedTransform;
     collisionBoxes[0]->showFaces = false;
     collisionBoxes[0]->showWireframe = true;
-    /*collisionBoxes[0]->isPickable = false;*/
     models[0]->AddChild(collisionBoxes[0]);
     models[0]->showFaces = false;
    
@@ -107,16 +106,21 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
         models[1]->Translate(speed * dir);
     }
     Eigen::AlignedBox3d box1, box2;
-    if (CollisionDetection::intersects(
-        AABBs[0],
-        models[0]->GetTransform().cast<double>(),
-        AABBs[1],
-        models[1]->GetTransform().cast<double>(),
-        box1,
-        box2))
+    if (models[1]->GetTransform() != prevTransform)
     {
-        startMoving = false;
+        prevTransform = models[1]->GetTransform();
+        if (CollisionDetection::intersects(
+            AABBs[0],
+            models[0]->GetTransform().cast<double>(),
+            AABBs[1],
+            models[1]->GetTransform().cast<double>(),
+            box1,
+            box2))
+            {
+                startMoving = false;
+            }
     }
+    
     
     /*
         
@@ -128,6 +132,7 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     find out how to calculate a_i and b_i and A_i and B_i and center of mass of mesh objects
 
     */
+
 }
 
 void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scancode, int action, int mods)
@@ -140,12 +145,12 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             glfwSetWindowShouldClose(window, GLFW_TRUE);
             break;
         case GLFW_KEY_UP:
-            models[1]->Rotate(-0.1, Axis::Z);
+            models[1]->Rotate(0.1, Axis::Z);
             //if (myAutoModel->meshIndex > 0) forMeshSimplification assignment1
             //    myAutoModel->meshIndex--;
             break;
         case GLFW_KEY_DOWN:
-            models[1]->Rotate(0.1, Axis::Z);
+            models[1]->Rotate(-0.1, Axis::Z);
             //if (myAutoModel->meshIndex < myAutoModel->GetMesh(0)->data.size())
             //    myAutoModel->meshIndex++;
             break;

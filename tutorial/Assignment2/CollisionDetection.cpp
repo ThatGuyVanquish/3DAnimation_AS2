@@ -28,15 +28,6 @@ namespace CollisionDetection {
                 trf = box.corner(Eigen::AlignedBox3d::TopRightFloor),
                 tlc = box.corner(Eigen::AlignedBox3d::TopLeftCeil),
                 trc = box.corner(Eigen::AlignedBox3d::TopRightCeil);
-
-        //std::cout << "bottom left floor " << blf.transpose() << std::endl;
-        //std::cout << "bottom right floor " << brf.transpose() << std::endl;
-        //std::cout << "blc " << blc.transpose() << std::endl;
-        //std::cout << "brc " << brc.transpose() << std::endl;
-        //std::cout << "tlf " << tlf.transpose() << std::endl;
-        //std::cout << "trf " << trf.transpose() << std::endl;
-        //std::cout << "tlc " << tlc.transpose() << std::endl;
-        //std::cout << "trc " << trc.transpose() << std::endl;
         Eigen::MatrixXd V(8, 3);
         V.row(0) = trc;
         V.row(1) = tlc;
@@ -116,7 +107,6 @@ namespace CollisionDetection {
             Eigen::AlignedBox3d &collidedBox1,
             Eigen::AlignedBox3d &collidedBox2
     ) {
-        std::cout << "blyat this is here\n";
 
         Eigen::Vector3d C1, a;
         Eigen::Matrix3d A;
