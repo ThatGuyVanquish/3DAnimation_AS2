@@ -126,7 +126,7 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     if (models[1]->GetTransform() != prevTransform)
     {
         kasd++;
-        std::cout << "test " << kasd << std::endl;
+        std::cout << "-------------------------------------------------- test --------------------------------------------------" << kasd << std::endl;
         prevTransform = models[1]->GetTransform();
         if (CollisionDetection::intersects(
             AABBs[0],

@@ -10,6 +10,7 @@
 #include <igl/AABB.h>
 #include <GLFW/glfw3.h>
 #include <igl/per_vertex_normals.h>
+#include <Movable.h>
 /*
 
 	Helper functions for collision detection
@@ -81,23 +82,31 @@ namespace CollisionDetection {
                                Eigen::Matrix3d &A,
                                Eigen::Vector3d &a) {
         // calculate C (center) in the global space
-        //std::cout << "center " << box.center().transpose() << std::endl;
-        Eigen::Vector4d Cvec4(0, 0, 0, 1);
-        Cvec4 = transform * Cvec4;
-        
-        C = Cvec4.head(3);
+        Eigen::Vector4d Cvec4;
+        std::cout << box.center() << std::endl;
+//        Cvec4 << C[0], C[1], C[2], 1;
+//        Cvec4 = transform * Cvec4;
+//        C = Cvec4.head(3);
+        Cvec4 << box.center()[0], box.center()[1], box.center()[2], 1;
+        C = (cg3d::Movable::GetTranslation(transform.cast<float>()).cast<double>() * Cvec4).head(3);
         // calculate A1, A2, A3 axes in the global space
-        Eigen::Vector4d A1vec4 = transform * Eigen::Vector4d(1, 0, 0, 1);
-        Eigen::Vector4d A2vec4 = transform * Eigen::Vector4d(0, 1, 0, 1);
-        Eigen::Vector4d A3vec4 = transform * Eigen::Vector4d(0, 0, 1, 1);
+        Eigen::Vector4d A1vec4 = cg3d::Movable::GetTranslationRotation(transform.cast<float>()).cast<double>() * Eigen::Vector4d(1, 0, 0, 0);
+        std::cout << "A1vec4: \n" << A1vec4 << std::endl;
+        Eigen::Vector4d A2vec4 = cg3d::Movable::GetTranslationRotation(transform.cast<float>()).cast<double>() * Eigen::Vector4d(0, 1, 0, 0);
+        std::cout << "A2vec4: \n" << A2vec4 << std::endl;
+        Eigen::Vector4d A3vec4 = cg3d::Movable::GetTranslationRotation(transform.cast<float>()).cast<double>() * Eigen::Vector4d(0, 0, 1, 0);
+        std::cout << "A3vec4: \n" << A3vec4 << std::endl;
+        std::cout << std::endl;
         A.col(0) = A1vec4.head(3);
         A.col(1) = A2vec4.head(3);
         A.col(2) = A3vec4.head(3);
 
         // calculate a1, a2, a3 extents
         Eigen::Vector4d a_vec4;
-        a_vec4 << box.sizes()[0], box.sizes()[1], box.sizes()[2], 1;
-        a = (transform * a_vec4).head(3) / 2;
+        a_vec4 << box.sizes()[0], box.sizes()[1], box.sizes()[2], 0;
+        std::cout << "a_vec4: " << a_vec4 << std::endl;
+        a = (cg3d::Movable::GetScaling(transform.cast<float>()).cast<double>() * a_vec4).head(3) / 2;
+        std::cout << "a: " << a << std::endl;
     }
 
     static bool intersects(
@@ -108,6 +117,7 @@ namespace CollisionDetection {
             Eigen::AlignedBox3d &collidedBox1,
             Eigen::AlignedBox3d &collidedBox2
     ) {
+        std::cout << "///////////////////////////////////////////////////////////////" << std::endl;
         Eigen::Vector3d C1, a;
         Eigen::Matrix3d A;
         calcBoxInSpace(obb1.m_box, transform1, C1, A, a);
@@ -118,6 +128,14 @@ namespace CollisionDetection {
         Eigen::Matrix3d C = A.transpose() * B;
         Eigen::Vector3d D = C2 - C1;
         std::cout << "C1 = " << C1.transpose() << " C2 = " << C2.transpose() << " D = " << D.transpose() << "\n\n";
+//        Eigen::Vector4d C1vec4(obb1.m_box.center()[0], obb1.m_box.center()[1], obb1.m_box.center()[2], 1);
+//        Eigen::Vector4d Dvec4 =
+//                cg3d::Movable::GetTranslationRotation(transform2.cast<float>()).cast<double>() *
+//                cg3d::Movable::GetTranslationRotation(transform1.cast<float>()).cast<double>().inverse() *
+//                C1vec4;
+//
+//        Eigen::Vector3d D = Dvec4.head(3);
+
         double R0;
         double R1;
         double R;
@@ -126,7 +144,7 @@ namespace CollisionDetection {
         R0 = a[0];
         R1 = b[0] * abs(C(0, 0)) + b[1] * abs(C(0, 1)) + b[2] * abs(C(0, 2));
         R = abs(A.col(0).transpose() * D);
-        std::cout << "A0, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl; 
+        std::cout << "A0, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
         if (R > R0 + R1) return false;
 
         // L = A1
