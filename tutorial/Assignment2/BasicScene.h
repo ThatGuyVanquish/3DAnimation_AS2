@@ -28,4 +28,6 @@ private:
     std::vector<std::shared_ptr<cg3d::AutoMorphingModel>> models;
     std::vector<igl::AABB<Eigen::MatrixXd, 3>> AABBs;
     std::vector<std::shared_ptr<cg3d::Model>> collisionBoxes;
+    void reset(const int objIndex, std::vector<std::shared_ptr<cg3d::AutoMorphingModel>> &models);
+    void resetCB();
 };
