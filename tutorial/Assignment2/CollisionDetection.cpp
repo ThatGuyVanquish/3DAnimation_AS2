@@ -104,7 +104,7 @@ namespace CollisionDetection {
 
         // calculate a1, a2, a3 extents
         Eigen::Vector4d a_vec4;
-        a_vec4 << box.sizes()[0], box.sizes()[1], box.sizes()[3], 1;
+        a_vec4 << box.sizes()[0], box.sizes()[1], box.sizes()[2], 1;
         a = (transform * a_vec4).head(3) / 2;
     }
 
