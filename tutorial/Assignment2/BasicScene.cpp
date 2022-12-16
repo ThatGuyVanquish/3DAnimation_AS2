@@ -131,9 +131,9 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
         if (CollisionDetection::intersects(
                 modelScale,
             AABBs[0],
-            models[0]->GetTin(),
+            models[0]->GetTransform(),
             AABBs[1],
-            models[1]->GetTin(),
+            models[1]->GetTransform(),
             box1,
             box2))
             {

@@ -161,7 +161,7 @@ namespace CollisionDetection {
 
     static void calcBoxInSpace(const float &scale,
                                const Eigen::AlignedBox3d &box,
-                               const Eigen::Matrix4d &transform,
+                               const Eigen::Matrix4f &transform,
                                Eigen::Vector3d &C,
                                Eigen::Matrix3d &A,
                                Eigen::Vector3d &a) {
@@ -194,15 +194,15 @@ namespace CollisionDetection {
 //        a = (cg3d::Movable::GetScaling(transform.cast<float>()).cast<double>() * a_vec4).head(3) / 2;
         a = (box.sizes() / 2) * scale;
         std::cout << "a: " << a << std::endl;
-//        assertAxis(box, transform, C, A, a);
+        assertAxis(box, transform.cast<double>(), C, A, a);
     }
 
     static bool intersects(
             const float &scale,
             const igl::AABB<Eigen::MatrixXd, 3> &obb1,
-            const Eigen::Matrix4d &transform1,
+            const Eigen::Matrix4f &transform1,
             const igl::AABB<Eigen::MatrixXd, 3> &obb2,
-            const Eigen::Matrix4d &transform2,
+            const Eigen::Matrix4f &transform2,
             Eigen::AlignedBox3d &collidedBox1,
             Eigen::AlignedBox3d &collidedBox2
     ) {
