@@ -168,16 +168,12 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
         {
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, GLFW_TRUE);
-break;
+            break;
         case GLFW_KEY_UP:
             models[1]->Rotate(0.1, Axis::Z);
-            //if (myAutoModel->meshIndex > 0) forMeshSimplification assignment1
-            //    myAutoModel->meshIndex--;
             break;
         case GLFW_KEY_DOWN:
             models[1]->Rotate(-0.1, Axis::Z);
-            //if (myAutoModel->meshIndex < myAutoModel->GetMesh(0)->data.size())
-            //    myAutoModel->meshIndex++;
             break;
         case GLFW_KEY_LEFT:
             models[1]->Rotate(0.1, Axis::Y);
