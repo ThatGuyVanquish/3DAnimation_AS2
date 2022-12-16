@@ -238,6 +238,16 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             m0->isHidden = !m0->isHidden;
             m1->isHidden = !m1->isHidden;
             break;
+        case GLFW_KEY_5:
+            m0->isHidden = !m0->isHidden;
+            break;
+        case GLFW_KEY_6:
+            models[0]->isHidden = !models[0]->isHidden;
+        case GLFW_KEY_7:
+            models[1]->isHidden = !models[1]->isHidden;
+        case GLFW_KEY_8:
+            m1->isHidden = !m1->isHidden;
+            break;
     }
         dir = models[1]->GetRotation() * Eigen::Vector3f::Identity();
     }
