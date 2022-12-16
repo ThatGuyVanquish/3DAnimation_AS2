@@ -38,7 +38,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         //"data/fertility.off" /* 3 */,
         "data/cube.off"};
     objIndex = 0;
-    decimations = 0;
+    decimations = 3;
     recalcQsRate = 10;
     std::chrono::time_point<std::chrono::steady_clock> m_StartTime = std::chrono::high_resolution_clock::now();
     myMeshObj = std::make_shared<MeshSimplification>(MeshSimplification(objFiles[objIndex], decimations, recalcQsRate));
@@ -151,8 +151,6 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
                     m1->showWireframe = true;
                     m0->isHidden = false;
                     m1->isHidden = false;
-                    //m1->Translate({ 0,0,10 });
-                    //m2->Translate({ 0,0,10 });
                     firstTime = false;
                 }
             }
