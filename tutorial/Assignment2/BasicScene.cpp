@@ -105,8 +105,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         cg3d::Mesh::Cube(),
         red
     );
-    //m1->isHidden = true;
-    //m2->isHidden = true;
+    m0->isHidden = true;
+    m1->isHidden = true;
     m0->aggregatedTransform = models[0]->aggregatedTransform;
     models[0]->AddChild(m0);
     m1->aggregatedTransform = models[1]->aggregatedTransform;
@@ -129,7 +129,7 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
         std::cout << "-------------------------------------------------- test --------------------------------------------------" << kasd << std::endl;
         prevTransform = models[1]->GetTransform();
         if (CollisionDetection::intersects(
-                modelScale,
+            modelScale,
             AABBs[0],
             models[0]->GetTransform(),
             AABBs[1],
@@ -241,7 +241,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
         case GLFW_KEY_8:
             m1->isHidden = !m1->isHidden;
             break;
-        }
+    }
         dir = models[1]->GetRotation() * Eigen::Vector3f::Identity();
     }
 }
