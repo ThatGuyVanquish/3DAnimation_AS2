@@ -289,8 +289,8 @@ void MeshSimplification::createDecimatedMesh(std::string fileName)
             int e = std::get<1>(currentTop);
             int v1 = E(e, 0), v2 = E(e, 1);
 
-            std::cout << "Edge: " << e << ", Cost = " << std::get<0>(currentTop) << ", New position: ("
-                << C.row(e) << ")" << std::endl;
+            //std::cout << "Edge: " << e << ", Cost = " << std::get<0>(currentTop) << ", New position: ("
+            //    << C.row(e) << ")" << std::endl;
         }
         if (collapsed_edges > 0)
         {
