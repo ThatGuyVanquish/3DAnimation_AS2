@@ -57,7 +57,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         );
         root->AddChild(models[i]);
     }
-    BasicScene::reset(objIndex, models);
+    modelScale = BasicScene::reset(objIndex, models);
     Eigen::MatrixXd V;
     Eigen::MatrixXi F;
     igl::read_triangle_mesh(objFiles[objIndex], V, F);
@@ -129,10 +129,11 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
         std::cout << "-------------------------------------------------- test --------------------------------------------------" << kasd << std::endl;
         prevTransform = models[1]->GetTransform();
         if (CollisionDetection::intersects(
+                modelScale,
             AABBs[0],
-            models[0]->GetTransform().cast<double>(),
+            models[0]->GetTin(),
             AABBs[1],
-            models[1]->GetTransform().cast<double>(),
+            models[1]->GetTin(),
             box1,
             box2))
             {
@@ -260,7 +261,7 @@ void BasicScene::CursorPosCallback(cg3d::Viewport* viewport, int x, int y, bool 
     }
 }
 
-void BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::AutoMorphingModel>>& models)
+float BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::AutoMorphingModel>>& models)
 {
     camera->SetTransform(Eigen::Matrix4f::Identity());
     float scale, distX = 0, distY = 0, cameraTranslate = 0;
@@ -301,7 +302,7 @@ void BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::Aut
     }
     for (int i = 0; i < models.size(); i++)
     {
-        models[i]->SetTransform(Eigen::Matrix4f::Identity());
+//        models[i]->SetTransform(Eigen::Matrix4f::Identity());
         models[i]->Scale(scale);
         models[i]->showWireframe = true;
         if (i % 2 == 0)
@@ -314,6 +315,7 @@ void BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::Aut
         models[i]->Translate(distY, Movable::Axis::Y);
     }
     camera->Translate({ 0, 0, cameraTranslate });
+    return scale;
 }
 
 void BasicScene::resetCB()
