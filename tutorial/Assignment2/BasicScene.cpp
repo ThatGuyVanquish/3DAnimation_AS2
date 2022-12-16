@@ -37,8 +37,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         //"data/fertility.off" /* 3 */,
         "data/cube.off"};
     objIndex = 0;
-    decimations = 0;
-    recalcQsRate = 10;
+    decimations = 2;
+    recalcQsRate = -1;
     std::chrono::time_point<std::chrono::steady_clock> m_StartTime = std::chrono::high_resolution_clock::now();
     myMeshObj = std::make_shared<MeshSimplification>(MeshSimplification(objFiles[objIndex], decimations, recalcQsRate));
     std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_StartTime;
@@ -58,9 +58,9 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         root->AddChild(models[i]);
     }
     modelScale = BasicScene::reset(objIndex, models);
-    Eigen::MatrixXd V;
-    Eigen::MatrixXi F;
-    igl::read_triangle_mesh(objFiles[objIndex], V, F);
+    Eigen::MatrixXd V = myMeshObj->getMesh()->data[decimations-1].vertices;
+    Eigen::MatrixXi F = myMeshObj->getMesh()->data[decimations-1].faces;;
+//    igl::read_triangle_mesh(objFiles[objIndex], V, F);
     for (int i = 0; i < 2; i++)
     {
         igl::AABB<Eigen::MatrixXd, 3> axisAligned;
@@ -128,6 +128,7 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
         kasd++;
         std::cout << "-------------------------------------------------- test --------------------------------------------------" << kasd << std::endl;
         prevTransform = models[1]->GetTransform();
+        std::chrono::time_point<std::chrono::steady_clock> m_StartTime = std::chrono::high_resolution_clock::now();
         if (CollisionDetection::intersects(
                 modelScale,
                 AABBs[0],
@@ -136,7 +137,9 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
                 models[1]->GetTransform(),
                 box0,
                 box1))
-            {
+        {
+                std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_StartTime;
+                std::cout << "Duration of intersects: " << duration.count() << std::endl;
                 startMoving = false;
                 if (firstTime)
                 {
@@ -155,7 +158,11 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
                     //m2->Translate({ 0,0,10 });
                     firstTime = false;
                 }
-            }
+        } else
+        {
+            std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_StartTime;
+            std::cout << "Duration of intersects: " << duration.count() << std::endl;
+        }
     }
 
 }
