@@ -59,8 +59,9 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         root->AddChild(models[i]);
     }
     modelScale = BasicScene::reset(objIndex, models);
-    Eigen::MatrixXd V = myMeshObj->getMesh()->data[0].vertices;
-    Eigen::MatrixXi F = myMeshObj->getMesh()->data[0].faces;
+    int meshUsed = decimations == 0 ? 0 : decimations - 1;
+    Eigen::MatrixXd V = myMeshObj->getMesh()->data[meshUsed].vertices;
+    Eigen::MatrixXi F = myMeshObj->getMesh()->data[meshUsed].faces;
     for (int i = 0; i < 2; i++)
     {
         igl::AABB<Eigen::MatrixXd, 3> axisAligned;
