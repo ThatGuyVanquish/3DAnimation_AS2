@@ -1,7 +1,6 @@
 #include "BasicScene.h"
 #include <chrono>
 using namespace cg3d;
-int kasd = 0;
 //possible fields
 bool startMoving = false;
 bool firstTime = true;
@@ -38,7 +37,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         //"data/fertility.off" /* 3 */,
         "data/cube.off"};
     objIndex = 0;
-    decimations = 3;
+    decimations = 5;
     recalcQsRate = 10;
     std::chrono::time_point<std::chrono::steady_clock> m_StartTime = std::chrono::high_resolution_clock::now();
     myMeshObj = std::make_shared<MeshSimplification>(MeshSimplification(objFiles[objIndex], decimations, recalcQsRate));
@@ -126,8 +125,6 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     Eigen::AlignedBox3d box0, box1;
     if (models[1]->GetTransform() != prevTransform)
     {
-        kasd++;
-        std::cout << "-------------------------------------------------- test --------------------------------------------------" << kasd << std::endl;
         prevTransform = models[1]->GetTransform();
         if (CollisionDetection::intersects(
                 modelScale,
