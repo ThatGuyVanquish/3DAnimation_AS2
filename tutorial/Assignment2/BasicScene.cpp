@@ -6,6 +6,7 @@ int kasd = 0;
 bool startMoving = false;
 bool firstTime = true;
 float speed;
+float cameraTranslate;
 int objIndex, decimations, recalcQsRate;
 Eigen::Vector3f dir = Movable::AxisVec(Movable::Axis::X);
 std::shared_ptr<cg3d::Model> m0, m1;
@@ -58,9 +59,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         root->AddChild(models[i]);
     }
     modelScale = BasicScene::reset(objIndex, models);
-    Eigen::MatrixXd V;
-    Eigen::MatrixXi F;
-    igl::read_triangle_mesh(objFiles[objIndex], V, F);
+    Eigen::MatrixXd V = myMeshObj->getMesh()->data[0].vertices;
+    Eigen::MatrixXi F = myMeshObj->getMesh()->data[0].faces;
     for (int i = 0; i < 2; i++)
     {
         igl::AABB<Eigen::MatrixXd, 3> axisAligned;
@@ -168,7 +168,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
         {
         case GLFW_KEY_ESCAPE:
             glfwSetWindowShouldClose(window, GLFW_TRUE);
-            break;
+break;
         case GLFW_KEY_UP:
             models[1]->Rotate(0.1, Axis::Z);
             //if (myAutoModel->meshIndex > 0) forMeshSimplification assignment1
@@ -199,6 +199,12 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
         case GLFW_KEY_D:
             camera->TranslateInSystem(system, { 0.05f, 0, 0 });
             break;
+        case GLFW_KEY_E:
+            camera->RotateInSystem(system, -0.05, cg3d::Movable::Axis::Y);
+            break;
+        case GLFW_KEY_Q:
+            camera->RotateInSystem(system, 0.05, cg3d::Movable::Axis::Y);
+            break;
         case GLFW_KEY_B:
             camera->TranslateInSystem(system, { 0, 0, 0.05f });
             break;
@@ -213,10 +219,10 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             BasicScene::resetCB();
             startMoving = false;
             break;
-        case GLFW_KEY_Q:
+        case GLFW_KEY_Z:
             speed *= -1;
             break;
-        case GLFW_KEY_E:
+        case GLFW_KEY_X:
             startMoving = !startMoving;
             break;
         case GLFW_KEY_1:
@@ -231,17 +237,41 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             m0->isHidden = !m0->isHidden;
             m1->isHidden = !m1->isHidden;
             break;
-        case GLFW_KEY_5:
+        case GLFW_KEY_4:
             m0->isHidden = !m0->isHidden;
             break;
-        case GLFW_KEY_6:
+        case GLFW_KEY_5:
             models[0]->isHidden = !models[0]->isHidden;
+            break;
+        case GLFW_KEY_6:
+            m1->isHidden = !m1->isHidden;
             break;
         case GLFW_KEY_7:
             models[1]->isHidden = !models[1]->isHidden;
             break;
-        case GLFW_KEY_8:
-            m1->isHidden = !m1->isHidden;
+        case GLFW_KEY_EQUAL:
+            camera->Translate({ 0,0,-0.1 });
+            break;
+        case GLFW_KEY_MINUS:
+            camera->Translate({ 0,0,0.1 });
+            break;
+        case GLFW_KEY_0:
+            camera->SetTransform(Eigen::Matrix4f::Identity());
+            camera->Translate({ 0, 0, cameraTranslate });
+            break;
+        case GLFW_KEY_RIGHT_BRACKET:
+            if (models[0]->meshIndex > 0)
+            {
+                models[0]->meshIndex--;
+                models[1]->meshIndex--;
+            }
+            break;
+        case GLFW_KEY_LEFT_BRACKET:
+            if (models[0]->meshIndex < decimations)
+            {
+                models[0]->meshIndex++;
+                models[1]->meshIndex++;
+            }
             break;
     }
         dir = models[1]->GetRotation() * Eigen::Vector3f::Identity();
@@ -282,7 +312,8 @@ void BasicScene::CursorPosCallback(cg3d::Viewport* viewport, int x, int y, bool 
 float BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::AutoMorphingModel>>& models)
 {
     camera->SetTransform(Eigen::Matrix4f::Identity());
-    float scale, distX = 0, distY = 0, cameraTranslate = 0;
+    float scale, distX = 0, distY = 0;
+    cameraTranslate = 0;
     switch (objIndex)
     {
         case 0: /* Bunny */
