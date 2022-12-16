@@ -57,7 +57,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         );
         root->AddChild(models[i]);
     }
-    modelScale = BasicScene::reset(objIndex, models);
+    BasicScene::reset(objIndex, models);
     Eigen::MatrixXd V;
     Eigen::MatrixXi F;
     igl::read_triangle_mesh(objFiles[objIndex], V, F);
@@ -95,6 +95,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     collisionBoxes[1]->showFaces = false;
     collisionBoxes[1]->showWireframe = true;
     models[1]->showFaces = false;
+    prevTransform = models[1]->GetAggregatedTransform();
     m0 = cg3d::Model::Create(
         "cb0",
         cg3d::Mesh::Cube(),
@@ -105,8 +106,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         cg3d::Mesh::Cube(),
         red
     );
-    //m1->isHidden = true;
-    //m2->isHidden = true;
+    m0->isHidden = true;
+    m1->isHidden = true;
     m0->aggregatedTransform = models[0]->aggregatedTransform;
     models[0]->AddChild(m0);
     m1->aggregatedTransform = models[1]->aggregatedTransform;
@@ -123,17 +124,23 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
         models[1]->Translate(speed * dir);
     }
     Eigen::AlignedBox3d box1, box2;
-    if (models[1]->GetTransform() != prevTransform)
+
+    std::cout << "root transform\n" << root->GetTransform() << std::endl;
+    std::cout << "root aggregated transform\n" << root->GetAggregatedTransform() << std::endl;
+    std::cout << "models[1] transform\n" << models[1]->GetTransform() << std::endl;
+    std::cout << "models[1] aggregated transform\n" << models[1]->GetAggregatedTransform() << std::endl;
+
+    if (models[1]->GetAggregatedTransform() != prevTransform)
     {
         kasd++;
-        std::cout << "-------------------------------------------------- test --------------------------------------------------" << kasd << std::endl;
+        std::cout << "test " << kasd << std::endl;
         prevTransform = models[1]->GetTransform();
         if (CollisionDetection::intersects(
-                modelScale,
+            modelScale,
             AABBs[0],
-            models[0]->GetTransform(),
+            models[0]->GetAggregatedTransform().cast<double>(),
             AABBs[1],
-            models[1]->GetTransform(),
+            models[1]->GetAggregatedTransform().cast<double>(),
             box1,
             box2))
             {
@@ -223,7 +230,15 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             collisionBoxes[0]->isHidden = !collisionBoxes[0]->isHidden;
             collisionBoxes[1]->isHidden = !collisionBoxes[1]->isHidden;
             break;
-        }
+        case GLFW_KEY_2:
+            models[0]->isHidden = !models[0]->isHidden;
+            models[1]->isHidden = !models[1]->isHidden;
+            break;
+        case GLFW_KEY_3:
+            m0->isHidden = !m0->isHidden;
+            m1->isHidden = !m1->isHidden;
+            break;
+    }
         dir = models[1]->GetRotation() * Eigen::Vector3f::Identity();
     }
 }
@@ -300,7 +315,7 @@ float BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::Au
     }
     for (int i = 0; i < models.size(); i++)
     {
-//        models[i]->SetTransform(Eigen::Matrix4f::Identity());
+        models[i]->SetTransform(Eigen::Matrix4f::Identity());
         models[i]->Scale(scale);
         models[i]->showWireframe = true;
         if (i % 2 == 0)
