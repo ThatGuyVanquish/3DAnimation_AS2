@@ -36,7 +36,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         //"data/cheburashka.off", /* 2 */
         //"data/fertility.off" /* 3 */,
         "data/cube.off"};
-    objIndex = 2;
+    objIndex = 0;
     decimations = 0;
     recalcQsRate = 10;
     std::chrono::time_point<std::chrono::steady_clock> m_StartTime = std::chrono::high_resolution_clock::now();
@@ -68,7 +68,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         AABBs.push_back(axisAligned);
     }
 
-    // bounding box for staionary object
+    // bounding box for stationary object
     collisionBoxes.push_back(
         cg3d::Model::Create(
             "Bounding box 0", 
@@ -122,29 +122,29 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     {
         models[1]->Translate(speed * dir);
     }
-    Eigen::AlignedBox3d box1, box2;
+    Eigen::AlignedBox3d box0, box1;
     if (models[1]->GetTransform() != prevTransform)
     {
         kasd++;
         std::cout << "-------------------------------------------------- test --------------------------------------------------" << kasd << std::endl;
         prevTransform = models[1]->GetTransform();
         if (CollisionDetection::intersects(
-            modelScale,
-            AABBs[0],
-            models[0]->GetTransform(),
-            AABBs[1],
-            models[1]->GetTransform(),
-            box1,
-            box2))
+                modelScale,
+                AABBs[0],
+                models[0]->GetTransform(),
+                AABBs[1],
+                models[1]->GetTransform(),
+                box0,
+                box1))
             {
                 startMoving = false;
                 if (firstTime)
                 {
-                    std::vector<std::shared_ptr<cg3d::Mesh>> test1, test2;
+                    std::vector<std::shared_ptr<cg3d::Mesh>> test0, test1;
+                    test0.push_back(CollisionDetection::meshifyBoundingBox(box0));
                     test1.push_back(CollisionDetection::meshifyBoundingBox(box1));
-                    test2.push_back(CollisionDetection::meshifyBoundingBox(box2));
-                    m0->SetMeshList(test1);
-                    m1->SetMeshList(test2);
+                    m0->SetMeshList(test0);
+                    m1->SetMeshList(test1);
                     m0->showFaces = false;
                     m1->showFaces = false;
                     m0->showWireframe = true;
@@ -236,8 +236,10 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             break;
         case GLFW_KEY_6:
             models[0]->isHidden = !models[0]->isHidden;
+            break;
         case GLFW_KEY_7:
             models[1]->isHidden = !models[1]->isHidden;
+            break;
         case GLFW_KEY_8:
             m1->isHidden = !m1->isHidden;
             break;
