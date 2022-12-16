@@ -20,6 +20,6 @@ We added two simple optimizations:
 1) We used the mesh simplification method from assignment 1 to simplify the mesh and calculate the collisions based on the decimated meshes.
 2) The collision check occurs only if the designated 'moving' object has moved. 
 
-1) Changing the value [decimations](https://github.com/ThatGuyVanquish/3DAnimation_AS2/blob/5629ec42e52c8a7878fe9574439d8b32084deb7d/tutorial/Assignment2/BasicScene.cpp#L41) changes the mesh used to calculate collisisons.
+1*) Changing the value [decimations](https://github.com/ThatGuyVanquish/3DAnimation_AS2/blob/5629ec42e52c8a7878fe9574439d8b32084deb7d/tutorial/Assignment2/BasicScene.cpp#L41) changes the mesh used to calculate collisisons.
 
-2) We keep the previous transformation matrix [prevTransform](https://github.com/ThatGuyVanquish/3DAnimation_AS2/blob/5629ec42e52c8a7878fe9574439d8b32084deb7d/tutorial/Assignment2/BasicScene.h#L33) and recalculate the OBB only if it has [moved](https://github.com/ThatGuyVanquish/3DAnimation_AS2/blob/5629ec42e52c8a7878fe9574439d8b32084deb7d/tutorial/Assignment2/BasicScene.cpp#L127).
+2*) We keep the previous transformation matrix [prevTransform](https://github.com/ThatGuyVanquish/3DAnimation_AS2/blob/5629ec42e52c8a7878fe9574439d8b32084deb7d/tutorial/Assignment2/BasicScene.h#L33) and recalculate the OBB only if it has [moved](https://github.com/ThatGuyVanquish/3DAnimation_AS2/blob/5629ec42e52c8a7878fe9574439d8b32084deb7d/tutorial/Assignment2/BasicScene.cpp#L127).
