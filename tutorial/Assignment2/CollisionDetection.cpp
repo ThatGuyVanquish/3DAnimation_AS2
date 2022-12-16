@@ -161,7 +161,7 @@ namespace CollisionDetection {
 
     static void calcBoxInSpace(const float &scale,
                                const Eigen::AlignedBox3d &box,
-                               const Eigen::Affine3f &Tin,
+                               const Eigen::Matrix4d &transform,
                                Eigen::Vector3d &C,
                                Eigen::Matrix3d &A,
                                Eigen::Vector3d &a) {
@@ -172,15 +172,15 @@ namespace CollisionDetection {
 //        Cvec4 = transform * Cvec4;
 //        C = Cvec4.head(3);
         Cvec4 << box.center()[0], box.center()[1], box.center()[2], 1;
-        std::cout << "Tin\n" << Tin << std::endl;
-        C = (Tin.cast<double>() * Cvec4).head(3);
-        std::cout << "Center after Tin:\n" << C << std::endl;
+        std::cout << "transform\n" << transform << std::endl;
+        C = (transform.cast<double>() * Cvec4).head(3);
+        std::cout << "Center after transform:\n" << C << std::endl;
         // calculate A1, A2, A3 axes in the global space
-        Eigen::Vector4d A1vec4 = Tin.cast<double>() * Eigen::Vector4d(1, 0, 0, 0);
+        Eigen::Vector4d A1vec4 = transform.cast<double>() * Eigen::Vector4d(1, 0, 0, 0);
         std::cout << "A1vec4: \n" << A1vec4 << std::endl;
-        Eigen::Vector4d A2vec4 = Tin.cast<double>() * Eigen::Vector4d(0, 1, 0, 0);
+        Eigen::Vector4d A2vec4 = transform.cast<double>() * Eigen::Vector4d(0, 1, 0, 0);
         std::cout << "A2vec4: \n" << A2vec4 << std::endl;
-        Eigen::Vector4d A3vec4 = Tin.cast<double>() * Eigen::Vector4d(0, 0, 1, 0);
+        Eigen::Vector4d A3vec4 = transform.cast<double>() * Eigen::Vector4d(0, 0, 1, 0);
         std::cout << "A3vec4: \n" << A3vec4 << std::endl;
         std::cout << std::endl;
         A.col(0) = A1vec4.head(3);
@@ -200,21 +200,22 @@ namespace CollisionDetection {
     static bool intersects(
             const float &scale,
             const igl::AABB<Eigen::MatrixXd, 3> &obb1,
-            const Eigen::Affine3f &Tin1,
+            const Eigen::Matrix4d &transform1,
             const igl::AABB<Eigen::MatrixXd, 3> &obb2,
-            const Eigen::Affine3f &Tin2,
+            const Eigen::Matrix4d &transform2,
             Eigen::AlignedBox3d &collidedBox1,
             Eigen::AlignedBox3d &collidedBox2
     ) {
         std::cout << "///////////////////////////////////////////////////////////////" << std::endl;
         Eigen::Vector3d C1, a;
         Eigen::Matrix3d A;
-        calcBoxInSpace(scale, obb1.m_box, Tin1, C1, A, a);
+        calcBoxInSpace(scale, obb1.m_box, transform1, C1, A, a);
         Eigen::Vector3d C2, b;
         Eigen::Matrix3d B;
-        calcBoxInSpace(scale, obb2.m_box, Tin2, C2, B, b);
+        calcBoxInSpace(scale, obb2.m_box, transform2, C2, B, b);
 
         Eigen::Matrix3d C = A.transpose() * B;
+        std::cout << "A is\n" << A << "\nB is\n" << B << "\nC is\n" << C << "\n\n";
         Eigen::Vector3d D = C2 - C1;
         std::cout << "C1 = " << C1.transpose() << " C2 = " << C2.transpose() << " D = " << D.transpose() << "\n\n";
 //        Eigen::Vector4d C1vec4(obb1.m_box.center()[0], obb1.m_box.center()[1], obb1.m_box.center()[2], 1);
@@ -233,7 +234,7 @@ namespace CollisionDetection {
         R0 = a[0];
         R1 = b[0] * abs(C(0, 0)) + b[1] * abs(C(0, 1)) + b[2] * abs(C(0, 2));
         R = abs(A.col(0).transpose() * D);
-        std::cout << "A0, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl;
+        std::cout << "A0, R = " << R << std::endl << "R0 = " << R0 << " R1 = " << R1 << std::endl << std::endl; 
         if (R > R0 + R1) return false;
 
         // L = A1
@@ -358,11 +359,12 @@ namespace CollisionDetection {
             collidedBox2 = obb2.m_box;
             return true;
         }
+        if (obb1.m_left == nullptr || obb2.m_left == nullptr) return false;
         return
-                intersects(scale, *obb1.m_left, Tin1, *obb2.m_left, Tin2, collidedBox1, collidedBox2) ||
-                intersects(scale, *obb1.m_left, Tin1, *obb2.m_right, Tin2, collidedBox1, collidedBox2) ||
-                intersects(scale, *obb1.m_right, Tin1, *obb2.m_left, Tin2, collidedBox1, collidedBox2) ||
-                intersects(scale, *obb1.m_right, Tin1, *obb2.m_right, Tin2, collidedBox1, collidedBox2);
+                intersects(scale, *obb1.m_left, transform1, *obb2.m_left, transform2, collidedBox1, collidedBox2) ||
+                intersects(scale, *obb1.m_left, transform1, *obb2.m_right, transform2, collidedBox1, collidedBox2) ||
+                intersects(scale, *obb1.m_right, transform1, *obb2.m_left, transform2, collidedBox1, collidedBox2) ||
+                intersects(scale, *obb1.m_right, transform1, *obb2.m_right, transform2, collidedBox1, collidedBox2);
     }
 
 }
