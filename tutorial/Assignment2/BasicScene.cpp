@@ -223,6 +223,24 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             collisionBoxes[0]->isHidden = !collisionBoxes[0]->isHidden;
             collisionBoxes[1]->isHidden = !collisionBoxes[1]->isHidden;
             break;
+        case GLFW_KEY_2:
+            models[0]->isHidden = !models[0]->isHidden;
+            models[1]->isHidden = !models[1]->isHidden;
+            break;
+        case GLFW_KEY_3:
+            m0->isHidden = !m0->isHidden;
+            m1->isHidden = !m1->isHidden;
+            break;
+        case GLFW_KEY_5:
+            m0->isHidden = !m0->isHidden;
+            break;
+        case GLFW_KEY_6:
+            models[0]->isHidden = !models[0]->isHidden;
+        case GLFW_KEY_7:
+            models[1]->isHidden = !models[1]->isHidden;
+        case GLFW_KEY_8:
+            m1->isHidden = !m1->isHidden;
+            break;
         }
         dir = models[1]->GetRotation() * Eigen::Vector3f::Identity();
     }
@@ -300,7 +318,7 @@ float BasicScene::reset(const int objIndex, std::vector<std::shared_ptr<cg3d::Au
     }
     for (int i = 0; i < models.size(); i++)
     {
-//        models[i]->SetTransform(Eigen::Matrix4f::Identity());
+        models[i]->SetTransform(Eigen::Matrix4f::Identity());
         models[i]->Scale(scale);
         models[i]->showWireframe = true;
         if (i % 2 == 0)
